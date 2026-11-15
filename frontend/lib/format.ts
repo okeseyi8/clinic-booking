@@ -4,7 +4,7 @@ const dateTimeFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium",
 
 export const formatDay = (iso: string) => dayFormat.format(new Date(iso));
 export const formatTimeRange = (start: string, end: string) =>
-  `${timeFormat.format(new Date(start))} – ${timeFormat.format(new Date(end))}`;
+  `${timeFormat.format(new Date(start))} - ${timeFormat.format(new Date(end))}`;
 export const formatDateTime = (iso: string) => dateTimeFormat.format(new Date(iso));
 
 /** Calendar-day key in the viewer's timezone, used to group slots by day. */

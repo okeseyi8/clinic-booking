@@ -92,7 +92,7 @@ export function BookingDialog({ slot, onClose }: { slot: Slot | null; onClose: (
               <Label htmlFor="name">Full name</Label>
               <Input autoComplete="name" autoFocus placeholder="Ada Obi" {...field("name")} />
               {errors.name && (
-                <p id="name-error" className="text-xs text-destructive">
+                <p id="name-error" className="text-sm text-destructive">
                   {errors.name}
                 </p>
               )}
@@ -102,7 +102,7 @@ export function BookingDialog({ slot, onClose }: { slot: Slot | null; onClose: (
               <Label htmlFor="email">Email</Label>
               <Input type="email" autoComplete="email" placeholder="ada@example.com" {...field("email")} />
               {errors.email && (
-                <p id="email-error" className="text-xs text-destructive">
+                <p id="email-error" className="text-sm text-destructive">
                   {errors.email}
                 </p>
               )}

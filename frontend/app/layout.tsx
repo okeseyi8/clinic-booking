@@ -1,24 +1,26 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Figtree, Fredoka } from "next/font/google";
 import { Providers } from "./providers";
-import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site/site-footer";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// Display: Fredoka's soft, rounded forms carry the friendly brand voice.
+// Body: Figtree is a clear, open sans that stays readable at small sizes for older patients.
+const display = Fredoka({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600"] });
+const body = Figtree({ variable: "--font-body", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Clinic Booking",
-  description: "See available appointment slots and book one in seconds.",
+  title: "HowBody · Family & general practice",
+  description: "A family practice for every age in Lagos. See open appointment times and book your visit in under a minute.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-muted/30">
+    <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
         <Providers>
-          <SiteHeader />
-          <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">{children}</main>
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
         </Providers>
       </body>
     </html>

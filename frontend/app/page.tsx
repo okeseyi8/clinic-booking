@@ -1,13 +1,25 @@
-import { SlotBrowser } from "@/components/slot-browser";
+import { Hero } from "@/components/home/hero";
+import { Intro } from "@/components/home/intro";
+import { Services } from "@/components/home/services";
+import { BookingSection } from "@/components/home/booking-section";
+import { WhyUs } from "@/components/home/why-us";
+import { Doctors } from "@/components/home/doctors";
+import { Testimonials } from "@/components/home/testimonials";
+import { Contact } from "@/components/home/contact";
+import { CtaBanner } from "@/components/home/cta-banner";
 
 export default function HomePage() {
   return (
-    <div className="grid gap-8">
-      <div className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Book an appointment</h1>
-        <p className="text-muted-foreground">Pick a time that works for you. It takes under a minute.</p>
-      </div>
-      <SlotBrowser />
-    </div>
+    <>
+      <Hero />
+      <Intro />
+      <Services />
+      <BookingSection />
+      <WhyUs />
+      <Doctors />
+      <Testimonials />
+      <Contact />
+      <CtaBanner />
+    </>
   );
 }

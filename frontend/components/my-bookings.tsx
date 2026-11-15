@@ -54,7 +54,7 @@ export function MyBookings() {
           </Button>
         </div>
         {inputError && (
-          <p id="lookup-email-error" className="text-xs text-destructive">
+          <p id="lookup-email-error" className="text-sm text-destructive">
             {inputError}
           </p>
         )}
@@ -75,7 +75,7 @@ function BookingList({ email }: { email: string }) {
     return (
       <div className="grid gap-2" aria-busy="true" aria-label="Loading bookings">
         {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton key={i} className="h-20 rounded-xl" />
+          <Skeleton key={i} className="h-24 rounded-2xl" />
         ))}
       </div>
     );
@@ -85,7 +85,7 @@ function BookingList({ email }: { email: string }) {
   const bookings = data.pages.flatMap((page) => page.bookings);
   if (bookings.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
+      <p className="rounded-2xl bg-card p-10 text-center text-muted-foreground ring-1 ring-border">
         No bookings found for {email}.
       </p>
     );
@@ -97,7 +97,7 @@ function BookingList({ email }: { email: string }) {
         {bookings.map((booking) => {
           const slot = slotById.get(booking.slot_id);
           return (
-            <li key={booking.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
+            <li key={booking.id} className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-card p-5 ring-1 ring-border">
               <Link href={`/bookings/${booking.id}`} className="min-w-0 grow hover:underline underline-offset-4">
                 <p className="font-medium">
                   {slot ? `${formatDay(slot.start)} · ${formatTimeRange(slot.start, slot.end)}` : `Slot ${booking.slot_id}`}

@@ -2,27 +2,32 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-
+/*
+ * HowBody design tokens.
+ * Strategy: "committed". Deep teal carries the brand across hero, footer and CTAs.
+ * Near-black teal is used for the two dark story blocks, and mint for soft highlights.
+ * Neutrals are tinted toward the teal hue (195), never toward cream.
+ * Shape rule: buttons and tags are full pills, cards and images are 16px, inputs are 12px.
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --font-heading: var(--font-display);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-teal-ink: var(--teal-ink);
+  --color-night: var(--night);
+  --color-night-soft: var(--night-soft);
+  --color-mint: var(--mint);
+  --color-mint-strong: var(--mint-strong);
+  --color-surface: var(--surface);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-muted: var(--on-dark-muted);
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -39,92 +44,176 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 16px;
+  --radius-2xl: 16px;
+  --radius-3xl: 16px;
+  --radius-4xl: 9999px;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  /* Brand */
+  --teal: oklch(0.38 0.068 195); /* hero, footer, primary buttons */
+  --teal-deep: oklch(0.32 0.058 197); /* hover / pressed teal */
+  --teal-ink: oklch(0.42 0.075 193); /* teal text on light surfaces (6.4:1 on white) */
+  --night: oklch(0.21 0.022 205); /* dark story blocks */
+  --night-soft: oklch(0.27 0.026 205); /* raised surfaces inside dark blocks */
+  --mint: oklch(0.955 0.028 182); /* soft highlight surfaces */
+  --mint-strong: oklch(0.88 0.06 180); /* accents on dark / teal */
+  --surface: oklch(0.985 0.004 195); /* page background, tinted to teal */
+  --on-dark: oklch(0.975 0.006 190);
+  --on-dark-muted: oklch(0.82 0.02 195); /* 9:1 on night, 5.6:1 on teal */
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* shadcn semantic tokens mapped onto the brand */
+  --background: var(--surface);
+  --foreground: oklch(0.22 0.02 205);
+  --card: oklch(0.995 0.002 195);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.995 0.002 195);
+  --popover-foreground: var(--foreground);
+  --primary: var(--teal);
+  --primary-foreground: var(--on-dark);
+  --secondary: var(--mint);
+  --secondary-foreground: var(--teal-deep);
+  --muted: oklch(0.955 0.008 195);
+  --muted-foreground: oklch(0.44 0.02 205); /* 7.9:1 on surface */
+  --accent: var(--mint);
+  --accent-foreground: var(--teal-deep);
+  --destructive: oklch(0.55 0.19 27);
+  --border: oklch(0.9 0.012 195);
+  --input: oklch(0.86 0.015 195);
+  --ring: oklch(0.55 0.09 192);
+  --radius: 16px;
+
+  /* Layering scale */
+  --z-sticky: 20;
+  --z-modal: 50;
+  --z-toast: 60;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+    scroll-padding-top: 1rem;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  /*
+   * Scalloped section edge, taken from the brand reference.
+   * A row of half-circles in the section's own color hangs over the next section.
+   * Set --edge to the section color. Geometric mask, no hand-drawn SVG.
+   */
+  .scallop-b,
+  .scallop-t {
+    position: relative;
+    --scallop: 22px;
+  }
+  .scallop-b::after,
+  .scallop-t::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--scallop);
+    background: var(--edge, var(--teal));
+    mask: radial-gradient(circle at 50% 0, #000 calc(var(--scallop) - 0.5px), #0000 var(--scallop)) 50% 0 /
+      calc(var(--scallop) * 2) var(--scallop) repeat-x;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .scallop-b::after {
+    top: calc(100% - 1px);
+  }
+  .scallop-t::before {
+    bottom: calc(100% - 1px);
+    transform: scaleY(-1);
+  }
+
+  /* Pill buttons used on brand surfaces. */
+  .btn-pill {
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-base font-semibold whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-(--ease-out-quart) outline-none focus-visible:ring-3 focus-visible:ring-ring/60 active:translate-y-px;
+  }
+  .btn-light {
+    @apply bg-on-dark text-teal-deep hover:bg-mint;
+  }
+  .btn-teal {
+    @apply bg-teal text-on-dark hover:bg-teal-deep;
+  }
+  .btn-ghost-light {
+    @apply text-on-dark ring-1 ring-on-dark/40 hover:bg-on-dark/10;
+  }
+}
+
+/*
+ * Motion. Content is always visible by default; animation only enhances it.
+ * - .rise: one orchestrated page-load sequence for the hero (stagger via --d).
+ * - .reveal: scroll-linked entrance where the browser supports view timelines.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 900ms var(--ease-out-expo) both;
+    animation-delay: var(--d, 0ms);
+  }
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+  .fade-swap {
+    animation: fade-swap 500ms var(--ease-out-quart) both;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(6px);
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.985);
+  }
+}
+@keyframes fade-swap {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
   }
 }

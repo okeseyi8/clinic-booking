@@ -3,8 +3,8 @@ import type { Booking } from "@/lib/schemas";
 
 export function BookingStatusBadge({ status }: { status: Booking["status"] }) {
   return status === "confirmed" ? (
-    <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Confirmed</Badge>
+    <Badge className="h-6 bg-mint px-2.5 text-sm text-teal-deep">Confirmed</Badge>
   ) : (
-    <Badge variant="secondary">Cancelled</Badge>
+    <Badge className="h-6 bg-muted px-2.5 text-sm text-muted-foreground">Cancelled</Badge>
   );
 }
