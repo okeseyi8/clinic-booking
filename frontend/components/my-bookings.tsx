@@ -9,6 +9,7 @@ import { CancelBookingButton } from "@/components/cancel-booking-button";
 import { ErrorState } from "@/components/error-state";
 import { useMyBookings } from "@/hooks/use-bookings";
 import { useSlots } from "@/hooks/use-slots";
+import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { useSession } from "@/lib/auth-client";
 import { formatDay, formatTimeRange, formatDateTime } from "@/lib/format";
 
@@ -22,6 +23,7 @@ const listSkeleton = (
 
 export function MyBookings() {
   const { data: session, isPending } = useSession();
+  const openAuth = useAuthDialog();
 
   if (isPending) return listSkeleton;
   if (!session) {
@@ -33,11 +35,9 @@ export function MyBookings() {
         <p className="font-display text-xl font-semibold">Log in to see your bookings</p>
         <p className="max-w-sm text-muted-foreground">Your visits are tied to your HowBody account, so only you can see or cancel them.</p>
         <div className="flex flex-wrap justify-center gap-2">
-          <Button asChild>
-            <Link href="/login?next=%2Fbookings">Log in</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/signup?next=%2Fbookings">Create account</Link>
+          <Button onClick={() => openAuth()}>Log in</Button>
+          <Button variant="outline" onClick={() => openAuth({ view: "signup" })}>
+            Create account
           </Button>
         </div>
       </div>

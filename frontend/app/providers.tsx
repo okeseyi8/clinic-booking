@@ -2,10 +2,11 @@
 
 import { useState, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthDialogProvider } from "@/components/auth/auth-dialog";
 import { Toaster } from "@/components/ui/sonner";
 import { ApiError } from "@/lib/api";
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({ googleEnabled, children }: { googleEnabled: boolean; children: ReactNode }) {
   // One client per browser session. useState keeps it stable across re-renders.
   const [queryClient] = useState(
     () =>
@@ -23,7 +24,7 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <AuthDialogProvider googleEnabled={googleEnabled}>{children}</AuthDialogProvider>
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );

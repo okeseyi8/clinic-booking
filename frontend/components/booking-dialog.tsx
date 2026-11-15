@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CalendarClock, Loader2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { useCreateBooking } from "@/hooks/use-bookings";
 import { useIdempotencyKey } from "@/hooks/use-idempotency-key";
 import { ApiError } from "@/lib/api";
@@ -31,14 +31,12 @@ function bookingErrorMessage(error: unknown): string {
   }
 }
 
-/** Where to come back to after logging in: the booking section. */
-const RETURN_TO = encodeURIComponent("/#book");
-
 export function BookingDialog({ slot, onClose }: { slot: Slot | null; onClose: () => void }) {
   const router = useRouter();
   const { data: session, isPending: sessionPending } = useSession();
   const createBooking = useCreateBooking();
   const idempotencyKeyFor = useIdempotencyKey();
+  const openAuth = useAuthDialog();
 
   function confirm() {
     if (!slot || !session || createBooking.isPending) return;
@@ -55,6 +53,8 @@ export function BookingDialog({ slot, onClose }: { slot: Slot | null; onClose: (
         onError: (error) => {
           toast.error(bookingErrorMessage(error));
           if (error instanceof ApiError && [401, 404, 409].includes(error.status)) onClose();
+          // Session expired mid-booking: log back in and come straight back to this slot.
+          if (error instanceof ApiError && error.status === 401) openAuth({ onSuccess: () => router.refresh() });
         },
       },
     );
@@ -66,12 +66,8 @@ export function BookingDialog({ slot, onClose }: { slot: Slot | null; onClose: (
         {slot && (
           <div className="grid gap-5">
             <DialogHeader>
-              <DialogTitle>{session || sessionPending ? `Book with ${slot.provider}` : "Log in to book this time"}</DialogTitle>
-              <DialogDescription>
-                {session || sessionPending
-                  ? "Check the details below, then confirm."
-                  : "You need a HowBody account to book. It takes less than a minute, and you can manage every visit in one place."}
-              </DialogDescription>
+              <DialogTitle>Book with {slot.provider}</DialogTitle>
+              <DialogDescription>Check the details below, then confirm.</DialogDescription>
             </DialogHeader>
 
             <div className="flex items-center gap-3 rounded-xl bg-mint p-4 text-teal-deep">
@@ -100,23 +96,10 @@ export function BookingDialog({ slot, onClose }: { slot: Slot | null; onClose: (
               <Button type="button" variant="outline" onClick={onClose} disabled={createBooking.isPending}>
                 Not now
               </Button>
-              {session ? (
-                <Button type="button" onClick={confirm} disabled={createBooking.isPending} autoFocus>
-                  {createBooking.isPending && <Loader2 className="animate-spin" aria-hidden />}
-                  Confirm booking
-                </Button>
-              ) : (
-                !sessionPending && (
-                  <>
-                    <Button asChild variant="secondary">
-                      <Link href={`/signup?next=${RETURN_TO}`}>Create account</Link>
-                    </Button>
-                    <Button asChild>
-                      <Link href={`/login?next=${RETURN_TO}`}>Log in</Link>
-                    </Button>
-                  </>
-                )
-              )}
+              <Button type="button" onClick={confirm} disabled={!session || createBooking.isPending} autoFocus>
+                {createBooking.isPending && <Loader2 className="animate-spin" aria-hidden />}
+                Confirm booking
+              </Button>
             </DialogFooter>
           </div>
         )}

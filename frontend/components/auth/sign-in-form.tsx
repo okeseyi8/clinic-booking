@@ -1,16 +1,22 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
 import { signInSchema } from "@/lib/schemas";
-import { Field, FormAlert, GoogleButton, OrDivider, PasswordField, SubmitButton, toFieldErrors, useNextPath, type FieldErrors } from "./fields";
+import {
+  Field,
+  FormAlert,
+  GoogleButton,
+  OrDivider,
+  PasswordField,
+  SubmitButton,
+  SwitchLink,
+  toFieldErrors,
+  type AuthFormProps,
+  type FieldErrors,
+} from "./fields";
 
-export function SignInForm({ googleEnabled }: { googleEnabled: boolean }) {
-  const router = useRouter();
-  const next = useNextPath();
-  const googleFailed = useSearchParams().get("error") === "google";
+export function SignInForm({ googleEnabled, onSuccess, onSwitch }: AuthFormProps) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string>();
   const [pending, setPending] = useState(false);
@@ -24,22 +30,21 @@ export function SignInForm({ googleEnabled }: { googleEnabled: boolean }) {
     setPending(true);
 
     const { error } = await signIn.email(parsed.data);
+    setPending(false);
     if (error) {
-      setPending(false);
       // One message for both cases, so the form doesn't reveal which emails have accounts.
-      return setFormError(error.status === 401 ? "That email and password don't match. Try again or reset your password." : (error.message ?? "Something went wrong. Please try again."));
+      return setFormError(
+        error.status === 401 ? "That email and password don't match. Try again or reset your password." : (error.message ?? "Something went wrong. Please try again."),
+      );
     }
-    router.replace(next);
+    onSuccess();
   }
-
-  const withNext = (path: string) => (next === "/" ? path : `${path}?next=${encodeURIComponent(next)}`);
 
   return (
     <div className="grid gap-6">
-      {googleFailed && <FormAlert>Google sign-in didn&apos;t finish. Please try again or use your email.</FormAlert>}
       {googleEnabled && (
         <>
-          <GoogleButton next={next} />
+          <GoogleButton />
           <OrDivider />
         </>
       )}
@@ -53,19 +58,16 @@ export function SignInForm({ googleEnabled }: { googleEnabled: boolean }) {
           autoComplete="current-password"
           error={errors.password}
           hint={
-            <Link href="/forgot-password" className="text-sm font-semibold text-teal-ink underline-offset-4 hover:underline">
+            <button type="button" onClick={() => onSwitch("forgot")} className="text-sm font-semibold text-teal-ink underline-offset-4 hover:underline">
               Forgot password?
-            </Link>
+            </button>
           }
         />
         <SubmitButton pending={pending}>Log in</SubmitButton>
       </form>
 
       <p className="text-center text-muted-foreground">
-        New to HowBody?{" "}
-        <Link href={withNext("/signup")} className="font-semibold text-teal-ink underline-offset-4 hover:underline">
-          Create an account
-        </Link>
+        New to HowBody? <SwitchLink onClick={() => onSwitch("signup")}>Create an account</SwitchLink>
       </p>
     </div>
   );

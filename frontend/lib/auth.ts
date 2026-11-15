@@ -18,9 +18,6 @@ const google =
     ? { clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET }
     : undefined;
 
-/** Lets server components show the Google button only when Google sign-in is configured. */
-export const googleEnabled = Boolean(google);
-
 /**
  * Accounts live in their own database ("howbody_auth"), separate from the booking API's data.
  * Better Auth reads BETTER_AUTH_SECRET and BETTER_AUTH_URL from the environment.
@@ -37,6 +34,8 @@ export const auth = betterAuth({
     },
   },
   socialProviders: google ? { google } : {},
+  // BETTER_AUTH_URL is always trusted. In dev, also accept the usual local ports so `next dev` works on any of them.
+  trustedOrigins: process.env.NODE_ENV === "production" ? [] : ["http://localhost:3000", "http://localhost:3100"],
   // Shared across serverless instances, like the booking API's own limiter.
   rateLimit: { storage: "database" },
   plugins: [nextCookies()],

@@ -1,15 +1,22 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signUp } from "@/lib/auth-client";
 import { signUpSchema } from "@/lib/schemas";
-import { Field, FormAlert, GoogleButton, OrDivider, PasswordField, SubmitButton, toFieldErrors, useNextPath, type FieldErrors } from "./fields";
+import {
+  Field,
+  FormAlert,
+  GoogleButton,
+  OrDivider,
+  PasswordField,
+  SubmitButton,
+  SwitchLink,
+  toFieldErrors,
+  type AuthFormProps,
+  type FieldErrors,
+} from "./fields";
 
-export function SignUpForm({ googleEnabled }: { googleEnabled: boolean }) {
-  const router = useRouter();
-  const next = useNextPath();
+export function SignUpForm({ googleEnabled, onSuccess, onSwitch }: AuthFormProps) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string>();
   const [pending, setPending] = useState(false);
@@ -24,22 +31,22 @@ export function SignUpForm({ googleEnabled }: { googleEnabled: boolean }) {
 
     // Accounts sign in straight away, so a new patient can book in the same visit.
     const { error } = await signUp.email(parsed.data);
+    setPending(false);
     if (error) {
-      setPending(false);
       return setFormError(
-        error.code === "USER_ALREADY_EXISTS" || error.status === 422
+        error.status === 422
           ? "An account with this email already exists. Log in instead, or reset your password."
           : (error.message ?? "Something went wrong. Please try again."),
       );
     }
-    router.replace(next);
+    onSuccess();
   }
 
   return (
     <div className="grid gap-6">
       {googleEnabled && (
         <>
-          <GoogleButton next={next} />
+          <GoogleButton />
           <OrDivider />
         </>
       )}
@@ -53,10 +60,7 @@ export function SignUpForm({ googleEnabled }: { googleEnabled: boolean }) {
       </form>
 
       <p className="text-center text-muted-foreground">
-        Already have an account?{" "}
-        <Link href={next === "/" ? "/login" : `/login?next=${encodeURIComponent(next)}`} className="font-semibold text-teal-ink underline-offset-4 hover:underline">
-          Log in
-        </Link>
+        Already have an account? <SwitchLink onClick={() => onSwitch("login")}>Log in</SwitchLink>
       </p>
     </div>
   );

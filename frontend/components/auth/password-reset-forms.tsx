@@ -6,11 +6,9 @@ import { useSearchParams } from "next/navigation";
 import { MailCheck } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { forgotPasswordSchema, resetPasswordSchema } from "@/lib/schemas";
-import { Field, FormAlert, PasswordField, SubmitButton, toFieldErrors, type FieldErrors } from "./fields";
+import { Field, FormAlert, PasswordField, SubmitButton, SwitchLink, toFieldErrors, type AuthView, type FieldErrors } from "./fields";
 
-const linkClass = "font-semibold text-teal-ink underline-offset-4 hover:underline";
-
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ onSwitch }: { onSwitch: (view: AuthView) => void }) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string>();
   const [sentTo, setSentTo] = useState<string>();
@@ -43,9 +41,7 @@ export function ForgotPasswordForm() {
           </p>
         </div>
         <p className="text-center text-muted-foreground">
-          <Link href="/login" className={linkClass}>
-            Back to log in
-          </Link>
+          <SwitchLink onClick={() => onSwitch("login")}>Back to log in</SwitchLink>
         </p>
       </div>
     );
@@ -59,10 +55,7 @@ export function ForgotPasswordForm() {
         <SubmitButton pending={pending}>Send reset link</SubmitButton>
       </form>
       <p className="text-center text-muted-foreground">
-        Remembered it?{" "}
-        <Link href="/login" className={linkClass}>
-          Log in
-        </Link>
+        Remembered it? <SwitchLink onClick={() => onSwitch("login")}>Log in</SwitchLink>
       </p>
     </div>
   );
@@ -81,7 +74,7 @@ export function ResetPasswordForm() {
     return (
       <div className="grid gap-5">
         <FormAlert>This reset link has expired or was already used. Ask for a new one and use it within an hour.</FormAlert>
-        <Link href="/forgot-password" className="btn-pill btn-teal">
+        <Link href="/?auth=forgot" className="btn-pill btn-teal">
           Get a new link
         </Link>
       </div>
@@ -92,7 +85,7 @@ export function ResetPasswordForm() {
     return (
       <div className="grid gap-5">
         <FormAlert tone="success">Your password has been changed. For your safety, you&apos;ve been signed out on other devices.</FormAlert>
-        <Link href="/login" className="btn-pill btn-teal">
+        <Link href="/?auth=login" className="btn-pill btn-teal">
           Log in with your new password
         </Link>
       </div>

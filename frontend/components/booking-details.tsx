@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookingStatusBadge } from "@/components/booking-status-badge";
 import { CancelBookingButton } from "@/components/cancel-booking-button";
 import { ErrorState } from "@/components/error-state";
+import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { useBooking } from "@/hooks/use-bookings";
 import { useSlots } from "@/hooks/use-slots";
 import { ApiError } from "@/lib/api";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 export function BookingDetails({ id }: { id: string }) {
   const { data: booking, isPending, isError, error, refetch } = useBooking(id);
   const { data: slots } = useSlots();
+  const openAuth = useAuthDialog();
 
   if (isPending) return <Skeleton className="h-96 rounded-2xl" aria-label="Loading booking" />;
   if (isError) {
@@ -25,9 +27,9 @@ export function BookingDetails({ id }: { id: string }) {
         <div className="grid justify-items-center gap-4 rounded-2xl bg-card p-10 text-center ring-1 ring-border">
           <p className="font-display text-xl font-semibold">Log in to see this booking</p>
           <p className="max-w-sm text-muted-foreground">Bookings are private to the account that made them.</p>
-          <Link href={`/login?next=${encodeURIComponent(`/bookings/${id}`)}`} className="btn-pill btn-teal">
+          <button type="button" onClick={() => openAuth()} className="btn-pill btn-teal">
             Log in
-          </Link>
+          </button>
         </div>
       );
     }
@@ -87,7 +89,7 @@ export function BookingDetails({ id }: { id: string }) {
 
       <footer className="flex flex-wrap gap-3 border-t px-8 py-6">
         <CancelBookingButton booking={booking} />
-        <Link href={`/bookings?email=${encodeURIComponent(booking.email)}`} className="btn-pill h-11 px-5 text-teal-ink hover:bg-mint">
+        <Link href="/bookings" className="btn-pill h-11 px-5 text-teal-ink hover:bg-mint">
           All my bookings
         </Link>
         <Link href={BOOK_HREF} className="btn-pill h-11 px-5 text-teal-ink hover:bg-mint">

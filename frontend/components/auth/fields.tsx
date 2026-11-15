@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,13 +16,22 @@ export function toFieldErrors(issues: { path: PropertyKey[]; message: string }[]
   return errors;
 }
 
-/**
- * Where to send the user after auth. Only same-site paths are allowed, so a crafted
- * link like /login?next=https://evil.example can't bounce users off the site.
- */
-export function useNextPath() {
-  const next = useSearchParams().get("next");
-  return next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : "/";
+export type AuthView = "login" | "signup" | "forgot";
+
+/** Props shared by the forms rendered inside the auth modal. */
+export interface AuthFormProps {
+  googleEnabled: boolean;
+  onSuccess: () => void;
+  onSwitch: (view: AuthView) => void;
+}
+
+/** Link-styled button that swaps the modal to another view. */
+export function SwitchLink({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button type="button" onClick={onClick} className="font-semibold text-teal-ink underline-offset-4 hover:underline">
+      {children}
+    </button>
+  );
 }
 
 type FieldProps = React.ComponentProps<"input"> & { name: string; label: string; error?: string; hint?: React.ReactNode };
@@ -107,7 +115,7 @@ export function OrDivider() {
 }
 
 /** "Continue with Google". Uses Google's own four-colour mark, as their branding rules require. */
-export function GoogleButton({ next }: { next: string }) {
+export function GoogleButton() {
   const [pending, setPending] = useState(false);
   return (
     <button
@@ -115,7 +123,9 @@ export function GoogleButton({ next }: { next: string }) {
       disabled={pending}
       onClick={async () => {
         setPending(true);
-        const { error } = await signIn.social({ provider: "google", callbackURL: next, errorCallbackURL: "/login?error=google" });
+        // Full-page redirect to Google and back to where the user was. Failures return with ?auth=google-error.
+        const here = window.location.pathname + window.location.hash;
+        const { error } = await signIn.social({ provider: "google", callbackURL: here, errorCallbackURL: `${window.location.pathname}?auth=google-error` });
         if (error) setPending(false);
       }}
       className="btn-pill w-full bg-card text-foreground ring-1 ring-input hover:bg-mint disabled:opacity-70"

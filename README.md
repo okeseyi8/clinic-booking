@@ -135,7 +135,7 @@ The tests start an in-memory MongoDB and cover every level:
 
 Anyone can browse open times. Booking, viewing and cancelling need an account.
 
-- **Library:** [Better Auth](https://better-auth.com) inside the Next.js app: email + password, Google sign-in, and forgot/reset password. Accounts live in their own Mongo database (`howbody_auth`), separate from the booking API's data.
+- **Library:** [Better Auth](https://better-auth.com) inside the Next.js app: email + password, Google sign-in, and forgot/reset password. Log in, sign up and forgot password live in one modal (`components/auth/auth-dialog.tsx`); only `/reset-password` is a page, because the emailed link has to land somewhere. Accounts live in their own Mongo database (`howbody_auth`), separate from the booking API's data.
 - **Where the rule is enforced:** the BFF proxy (`frontend/app/api/[...path]/route.ts`), not the browser. Every bookings route needs a session. The proxy fills in `name` and `email` from the account and scopes list, read and cancel to the user's own email, so the booking API keeps its exact spec contract.
 - **Email:** Brevo's free tier (300/day, no own domain needed) over plain `fetch` (`frontend/lib/mail.ts`). Without a key in dev, emails print to the console.
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { CalendarCheck2, LogOut } from "lucide-react";
+import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { signOut, useSession } from "@/lib/auth-client";
 
 /** Log in link when signed out; an initial-avatar disclosure with account actions when signed in. */
@@ -11,17 +12,19 @@ export function AccountMenu() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data: session, isPending } = useSession();
+  const openAuth = useAuthDialog();
 
   if (isPending) return <span className="size-11 animate-pulse rounded-full bg-on-dark/15" aria-hidden />;
 
   if (!session) {
     return (
-      <Link
-        href="/login"
+      <button
+        type="button"
+        onClick={() => openAuth()}
         className="rounded-full px-4 py-2.5 text-[0.95rem] font-semibold text-on-dark ring-1 ring-on-dark/40 transition-colors hover:bg-on-dark/10 focus-visible:ring-3 focus-visible:ring-ring/60 focus-visible:outline-none"
       >
         Log in
-      </Link>
+      </button>
     );
   }
 
