@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 
 /**
  * Backend-for-frontend proxy.
@@ -9,6 +10,11 @@ import type { NextRequest } from "next/server";
  *
  * Only the routes the UI needs are allowed through. Admin routes such as
  * POST /reset are never reachable from the public site.
+ *
+ * Accounts: anyone can browse slots, but every bookings route needs a signed-in user.
+ * The booking API itself stays exactly as specified (name + email in the body), so the
+ * proxy fills those in from the session and scopes reads and cancels to the user's own email.
+ * The browser can't book or look up bookings under someone else's address.
  */
 const ALLOWED_ROUTES: ReadonlyArray<readonly [method: string, path: RegExp]> = [
   ["GET", /^slots$/],
@@ -38,15 +44,41 @@ async function proxy(req: NextRequest, ctx: RouteContext<"/api/[...path]">) {
   const headers = new Headers({ "X-API-Key": API_KEY, "Content-Type": "application/json" });
   const idempotencyKey = req.headers.get("idempotency-key");
   if (idempotencyKey) headers.set("Idempotency-Key", idempotencyKey);
+  const base = BACKEND_URL.replace(/\/$/, "");
+  const call = (path: string, init: RequestInit = {}) =>
+    fetch(`${base}/${path}`, { headers, cache: "no-store", signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS), ...init });
 
   try {
-    const upstream = await fetch(`${BACKEND_URL.replace(/\/$/, "")}/${target}${req.nextUrl.search}`, {
-      method: req.method,
-      headers,
-      body: req.method === "POST" ? await req.text() : undefined,
-      cache: "no-store",
-      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
-    });
+    let upstream: Response;
+    if (target === "slots") {
+      upstream = await call(`slots${req.nextUrl.search}`);
+    } else {
+      const session = await auth.api.getSession({ headers: req.headers });
+      if (!session) return Response.json({ error: "please sign in to continue" }, { status: 401 });
+      const { name, email } = session.user;
+
+      if (req.method === "POST") {
+        const body: unknown = await req.json().catch(() => null);
+        const slotId = body && typeof body === "object" && "slot_id" in body ? body.slot_id : undefined;
+        upstream = await call("bookings", { method: "POST", body: JSON.stringify({ slot_id: slotId, name, email }) });
+      } else if (target === "bookings") {
+        const params = new URLSearchParams(req.nextUrl.search);
+        params.set("email", email);
+        upstream = await call(`bookings?${params}`);
+      } else {
+        // Single booking: only its owner may read or cancel it. Others get the same 404 as a missing id.
+        const existing = await call(target);
+        if (!existing.ok) {
+          upstream = existing;
+        } else {
+          const booking = (await existing.json()) as { email?: string };
+          if (booking.email?.toLowerCase() !== email.toLowerCase()) {
+            return Response.json({ error: "booking not found" }, { status: 404 });
+          }
+          upstream = req.method === "DELETE" ? await call(target, { method: "DELETE" }) : Response.json(booking);
+        }
+      }
+    }
 
     const responseHeaders = new Headers({ "Content-Type": "application/json", "Cache-Control": "no-store" });
     for (const name of FORWARDED_RESPONSE_HEADERS) {

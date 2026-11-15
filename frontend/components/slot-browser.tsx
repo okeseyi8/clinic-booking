@@ -5,7 +5,9 @@ import { CalendarX2, Search, SearchX, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "@/components/booking-dialog";
 import { ErrorState } from "@/components/error-state";
+import { useAuthDialog } from "@/components/auth/auth-dialog";
 import { useSlots } from "@/hooks/use-slots";
+import { useSession } from "@/lib/auth-client";
 import { dayKey, formatDay, formatTimeRange } from "@/lib/format";
 import type { Slot } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
@@ -40,6 +42,17 @@ export function SlotBrowser() {
   const [provider, setProvider] = useState(ANY);
   const [openOnly, setOpenOnly] = useState(true);
   const [selected, setSelected] = useState<Slot | null>(null);
+  const { data: session } = useSession();
+  const openAuth = useAuthDialog();
+
+  // Signed-out patients log in first; the booking confirmation opens as soon as they're in.
+  const pick = (slot: Slot) => {
+    if (session) return setSelected(slot);
+    openAuth({
+      description: `Log in or create an account to book ${formatDay(slot.start)}, ${formatTimeRange(slot.start, slot.end)} with ${slot.provider}.`,
+      onSuccess: () => setSelected(slot),
+    });
+  };
 
   // "Started" is judged at fetch time (refreshed every 30s); the server re-checks on booking anyway.
   const now = dataUpdatedAt;
@@ -132,7 +145,7 @@ export function SlotBrowser() {
               </h3>
               <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {daySlots.map((slot) => (
-                  <SlotButton key={slot.id} slot={slot} bookable={isBookable(slot, now)} started={Date.parse(slot.start) <= now} onPick={setSelected} />
+                  <SlotButton key={slot.id} slot={slot} bookable={isBookable(slot, now)} started={Date.parse(slot.start) <= now} onPick={pick} />
                 ))}
               </ul>
             </section>

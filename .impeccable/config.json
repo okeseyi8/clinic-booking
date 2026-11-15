@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-11-15T12:16:03.577Z",
+        "reason": "Claude: email HTML in lib/mail.ts needs a web-safe font stack; email clients don't reliably load web fonts"
+      }
+    ]
+  }
+}

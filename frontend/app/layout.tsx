@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, Fredoka } from "next/font/google";
 import { Providers } from "./providers";
-import { SiteFooter } from "@/components/site/site-footer";
 import "./globals.css";
 
 // Display: Fredoka's soft, rounded forms carry the friendly brand voice.
@@ -18,10 +17,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <Providers>
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </Providers>
+        {/* Google's button only shows when its OAuth client is configured. */}
+        <Providers googleEnabled={Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)}>{children}</Providers>
       </body>
     </html>
   );

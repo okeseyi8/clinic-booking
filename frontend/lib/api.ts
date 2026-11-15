@@ -46,16 +46,15 @@ export const api = {
 
   getBooking: (id: string): Promise<Booking> => request(`/bookings/${encodeURIComponent(id)}`, bookingSchema),
 
-  listBookings: ({ email, cursor, limit = 10 }: { email: string; cursor?: string; limit?: number }): Promise<BookingPage> => {
-    const params = new URLSearchParams({ email, limit: String(limit) });
+  /** The signed-in user's bookings. The server scopes the list to the session's email. */
+  listMyBookings: ({ cursor, limit = 10 }: { cursor?: string; limit?: number }): Promise<BookingPage> => {
+    const params = new URLSearchParams({ limit: String(limit) });
     if (cursor) params.set("cursor", cursor);
     return request(`/bookings?${params}`, bookingPageSchema);
   },
 
-  createBooking: (
-    input: { slot_id: string; name: string; email: string },
-    idempotencyKey: string,
-  ): Promise<Booking> =>
+  /** Name and email come from the signed-in account on the server, so only the slot is sent. */
+  createBooking: (input: { slot_id: string }, idempotencyKey: string): Promise<Booking> =>
     request("/bookings", bookingSchema, {
       method: "POST",
       body: JSON.stringify(input),

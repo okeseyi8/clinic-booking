@@ -9,19 +9,19 @@ export function useBooking(id: string) {
   return useQuery({ queryKey: queryKeys.booking(id), queryFn: () => api.getBooking(id) });
 }
 
-/** Cursor pagination: each page hands back `next_cursor` until it's null. */
-export function useBookingsByEmail(email: string | null) {
+/** The signed-in user's bookings. Cursor pagination: each page hands back `next_cursor` until it's null. */
+export function useMyBookings(userId: string | undefined) {
   return useInfiniteQuery({
-    queryKey: queryKeys.bookings(email ?? ""),
-    queryFn: ({ pageParam }) => api.listBookings({ email: email!, cursor: pageParam }),
+    queryKey: queryKeys.bookings(userId ?? ""),
+    queryFn: ({ pageParam }) => api.listMyBookings({ cursor: pageParam }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
-    enabled: Boolean(email),
+    enabled: Boolean(userId),
   });
 }
 
 interface CreateBookingVars {
-  input: { slot_id: string; name: string; email: string };
+  input: { slot_id: string };
   idempotencyKey: string;
 }
 
