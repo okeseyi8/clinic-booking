@@ -13,7 +13,8 @@ import { createApp } from '../src/app.js';
  * instead of the instance failing forever.
  */
 const env = loadEnv();
-const app = createApp(env, pino({ level: env.LOG_LEVEL }));
+const logger = pino({ level: env.LOG_LEVEL });
+const app = createApp(env, logger);
 
 let ready: Promise<void> | undefined;
 const ensureDb = () =>
@@ -25,7 +26,8 @@ const ensureDb = () =>
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
     await ensureDb();
-  } catch {
+  } catch (err) {
+    logger.error({ err }, 'database connection failed');
     res.writeHead(503, { 'Content-Type': 'application/json' }).end(JSON.stringify({ error: 'database unavailable' }));
     return;
   }
