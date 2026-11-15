@@ -19,10 +19,22 @@ export function BookingDetails({ id }: { id: string }) {
 
   if (isPending) return <Skeleton className="h-96 rounded-2xl" aria-label="Loading booking" />;
   if (isError) {
-    const missing = error instanceof ApiError && error.status === 404;
+    const status = error instanceof ApiError ? error.status : 0;
+    if (status === 401) {
+      return (
+        <div className="grid justify-items-center gap-4 rounded-2xl bg-card p-10 text-center ring-1 ring-border">
+          <p className="font-display text-xl font-semibold">Log in to see this booking</p>
+          <p className="max-w-sm text-muted-foreground">Bookings are private to the account that made them.</p>
+          <Link href={`/login?next=${encodeURIComponent(`/bookings/${id}`)}`} className="btn-pill btn-teal">
+            Log in
+          </Link>
+        </div>
+      );
+    }
+    const missing = status === 404;
     return (
       <ErrorState
-        message={missing ? "We couldn't find that booking. Check the link, or look it up in My bookings." : error.message}
+        message={missing ? "We couldn't find that booking on your account. Check the link, or look in My bookings." : error.message}
         onRetry={missing ? undefined : () => refetch()}
       />
     );

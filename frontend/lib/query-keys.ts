@@ -3,5 +3,5 @@ export const queryKeys = {
   slots: ["slots"] as const,
   booking: (id: string) => ["booking", id] as const,
   bookingsAll: ["bookings"] as const,
-  bookings: (email: string) => ["bookings", email] as const,
+  bookings: (userId: string) => ["bookings", userId] as const,
 };

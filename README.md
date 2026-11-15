@@ -130,3 +130,22 @@ The tests start an in-memory MongoDB and cover every level:
 - Rate limiting is per email, as the spec defines it. Add a per-IP limit at the edge (WAF or CDN) for abuse spread across many emails.
 - `GET /slots` is unpaginated, per the spec. Add a date range or cursor once a clinic has thousands of future slots.
 - `POST /reset` isn't transactional because it's an admin/test operation.
+
+## Accounts (branch `feature/auth`)
+
+Anyone can browse open times. Booking, viewing and cancelling need an account.
+
+- **Library:** [Better Auth](https://better-auth.com) inside the Next.js app: email + password, Google sign-in, and forgot/reset password. Accounts live in their own Mongo database (`howbody_auth`), separate from the booking API's data.
+- **Where the rule is enforced:** the BFF proxy (`frontend/app/api/[...path]/route.ts`), not the browser. Every bookings route needs a session. The proxy fills in `name` and `email` from the account and scopes list, read and cancel to the user's own email, so the booking API keeps its exact spec contract.
+- **Email:** Brevo's free tier (300/day, no own domain needed) over plain `fetch` (`frontend/lib/mail.ts`). Without a key in dev, emails print to the console.
+
+Frontend environment variables:
+
+| Variable | Purpose |
+|---|---|
+| `MONGODB_URI` | Atlas connection string for accounts |
+| `BETTER_AUTH_SECRET` | Random 32+ byte secret for signing sessions |
+| `BETTER_AUTH_URL` | Public site URL, e.g. `https://howbody.vercel.app` |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth client (redirect URI: `<site>/api/auth/callback/google`) |
+| `BREVO_API_KEY` / `MAIL_FROM` | Brevo API key and the verified sender address |
+| `MONGODB_TRANSACTIONS` | Set to `false` only for a standalone local mongod |

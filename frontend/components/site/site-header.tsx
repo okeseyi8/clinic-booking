@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import { AccountMenu } from "./account-menu";
 import { Logo } from "./logo";
 import { BOOK_HREF, BOOK_LABEL } from "@/lib/site";
 
@@ -36,6 +37,7 @@ export function SiteHeader() {
         <Link href={BOOK_HREF} className="btn-pill btn-light hidden h-11 px-5 sm:inline-flex">
           {BOOK_LABEL}
         </Link>
+        <AccountMenu />
 
         <details className="group relative md:hidden">
           <summary
