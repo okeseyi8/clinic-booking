@@ -12,9 +12,9 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <BookingSection />
       <Intro />
       <Services />
-      <BookingSection />
       <WhyUs />
       <Doctors />
       <Testimonials />

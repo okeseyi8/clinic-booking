@@ -5,33 +5,13 @@ import { SiteHeader } from "@/components/site/site-header";
 import { BOOK_HREF, BOOK_LABEL, heroPhotos } from "@/lib/site";
 
 /*
- * Edge-to-edge photo strip, measured from the brand reference:
- * - left and right panels fill the outer thirds. Their inner edges lean inward and their
- *   bottoms dip toward the centre, so teal wedges show between the panels.
- * - the centre panel is a plain rectangle that starts ~14% lower than the sides.
- * - teal scallops hang over the top of the strip, and a teal band with scallops closes it below.
- * Clip paths are relative to each panel's own box.
+ * Edge-to-edge strip of three straight photos with a thin teal gap between them.
+ * Teal scallops from the text block above hang over the top of the strip.
  */
 const panels = [
-  {
-    photo: heroPhotos.left,
-    box: "left-0 top-0 bottom-0 w-[33.2%]",
-    clip: "polygon(0 0, 100% 0, 85% 98.5%, 0 87%)",
-    delay: "200ms",
-  },
-  {
-    photo: heroPhotos.center,
-    box: "left-[33.2%] top-[14.4%] bottom-0 w-[33.5%]",
-    clip: undefined,
-    delay: "280ms",
-    priority: true,
-  },
-  {
-    photo: heroPhotos.right,
-    box: "right-0 top-0 bottom-0 w-[33.3%]",
-    clip: "polygon(0 0, 100% 0, 100% 88%, 15.3% 99%)",
-    delay: "360ms",
-  },
+  { photo: heroPhotos.left, delay: "200ms" },
+  { photo: heroPhotos.center, delay: "280ms", priority: true },
+  { photo: heroPhotos.right, delay: "360ms" },
 ];
 
 export function Hero() {
@@ -60,13 +40,9 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="relative h-[clamp(15rem,37.7vw,40rem)]">
-        {panels.map(({ photo, box, clip, delay, priority }) => (
-          <div
-            key={photo.src}
-            className={`rise absolute overflow-hidden bg-teal-deep ${box}`}
-            style={{ clipPath: clip, ["--d" as string]: delay }}
-          >
+      <div className="grid h-[clamp(14rem,34vw,36rem)] grid-cols-3 gap-1.5 md:gap-2.5">
+        {panels.map(({ photo, delay, priority }) => (
+          <div key={photo.src} className="rise relative overflow-hidden bg-teal-deep" style={{ ["--d" as string]: delay }}>
             <Image src={photo.src} alt={photo.alt} fill sizes="34vw" priority={priority} className="object-cover" />
           </div>
         ))}
