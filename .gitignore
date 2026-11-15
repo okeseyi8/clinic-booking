@@ -8,3 +8,10 @@ dist
 .DS_Store
 notes.md
 rr.js
+
+# Docs: only the root README is committed
+*.md
+!/README.md
+
+# Local design-tool config
+.impeccable/
