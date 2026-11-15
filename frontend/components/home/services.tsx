@@ -38,7 +38,7 @@ export function Services() {
                 </div>
                 {/* The card body scallops up into the photo, echoing the section edges. */}
                 <div className="scallop-t grid gap-2 px-6 pt-2 pb-7 [--edge:var(--card)] [--scallop:14px]">
-                  <span className="-mt-9 mb-2 grid size-12 place-items-center rounded-full bg-teal text-on-dark ring-4 ring-card">
+                  <span className="relative z-2 -mt-9 mb-2 grid size-12 place-items-center rounded-full bg-teal text-on-dark ring-4 ring-card">
                     <Icon className="size-6" aria-hidden />
                   </span>
                   <h3 className="text-xl font-semibold">{service.title}</h3>
